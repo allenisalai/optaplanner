@@ -1,0 +1,31 @@
+package com.allenisalai.op;
+dialect "java"
+
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
+import com.allenisalai.op.Session;
+import com.allenisalai.op.Client;
+
+global HardSoftScoreHolder scoreHolder;
+
+rule "Client cannot exceed weekly hours"
+    when
+        $client : Client($weeklyContractHours : weeklyContractHours)
+        accumulate(
+            Session(
+                client == $client,
+                $duration : getDuration()
+                );
+            $scheduledHours : sum($duration);
+            $scheduledHours > $client.weeklyContractHours
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, $weeklyContractHours - $scheduledHours);
+end
+
+rule "Client have more than one session a day"
+    when
+        Client(id == "Tim")
+    then
+        System.out.print("Found Tim");
+        scoreHolder.addHardConstraintMatch(kcontext, 1000);
+end

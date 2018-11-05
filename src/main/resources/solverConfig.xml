@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+    <!-- Domain model configuration -->
+    <scanAnnotatedClasses/>
+
+    <!-- Score configuration -->
+    <scoreDirectorFactory>
+        <!--<easyScoreCalculatorClass>com.allenisalai.op.ScheduleEasyScoreCalculator</easyScoreCalculatorClass>-->
+        <scoreDrl>rules.drl</scoreDrl>
+    </scoreDirectorFactory>
+
+    <!-- Optimization algorithms configuration -->
+    <termination>
+        <secondsSpentLimit>30</secondsSpentLimit>
+    </termination>
+</solver>
