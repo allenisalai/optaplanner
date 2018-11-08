@@ -5,12 +5,11 @@
 
     <!-- Score configuration -->
     <scoreDirectorFactory>
-        <!--<easyScoreCalculatorClass>com.allenisalai.op.ScheduleEasyScoreCalculator</easyScoreCalculatorClass>-->
         <scoreDrl>rules.drl</scoreDrl>
     </scoreDirectorFactory>
 
     <!-- Optimization algorithms configuration -->
     <termination>
-        <secondsSpentLimit>30</secondsSpentLimit>
+        <secondsSpentLimit>10</secondsSpentLimit>
     </termination>
 </solver>

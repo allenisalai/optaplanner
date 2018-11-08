@@ -10,7 +10,6 @@ import org.optaplanner.core.api.solver.Solver;
 public class App {
     public static void main(String[] args) {
         //BasicConfigurator.configure();
-
         System.out.println("Starting the process.");
 
         SolverFactory<Schedule> solverFactory = SolverFactory.createFromXmlResource("solverConfig.xml");

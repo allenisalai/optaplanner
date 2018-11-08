@@ -7,6 +7,45 @@ import com.allenisalai.op.Client;
 
 global HardSoftScoreHolder scoreHolder;
 
+// ----------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------
+// Hard constraints
+// ----------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------
+
+// ++ Staff Rules
+// ________________________________________________________________________________________________________________
+
+rule "Sessions with the same staff cannot overlap"
+    when
+        $s1 : Session($s : staff, $id1 : id, startTime != 0, getDuration() != 0)
+        $s2 : Session(staff == $s, id != $id1, startTime != 0, getDuration() != 0)
+        eval($s1.overlaps($s2))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
+
+
+rule "Staff Should not exceed their max weekly hours"
+    when
+        $staff : Staff($maxWeeklyHours : maxWeeklyHours )
+        accumulate(
+            Session(
+                $staff == staff,
+                $duration : getDuration()
+                );
+            $scheduledHours : sum($duration);
+            $scheduledHours > $maxWeeklyHours
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext,  -1);
+end
+
+// rule "Staff can only bill for hour Types that they are cabable of" // 1-1 vs sup vs BCBA
+
+
+// ++ Client Rules
+// ________________________________________________________________________________________________________________
 rule "Client cannot exceed weekly hours"
     when
         $client : Client($weeklyContractHours : weeklyContractHours)
@@ -19,13 +58,49 @@ rule "Client cannot exceed weekly hours"
             $scheduledHours > $client.weeklyContractHours
         )
     then
-        scoreHolder.addHardConstraintMatch(kcontext, $weeklyContractHours - $scheduledHours);
+        //scoreHolder.addHardConstraintMatch(kcontext, $weeklyContractHours - $scheduledHours);
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
 end
 
-rule "Client have more than one session a day"
+
+rule "Client be as close to their weekly hours as possible"
     when
-        Client(id == "Tim")
+        $client : Client($weeklyContractHours : weeklyContractHours)
+        accumulate(
+            Session(
+                client == $client,
+                $duration : getDuration()
+                );
+            $scheduledHours : sum($duration);
+            $scheduledHours < $client.weeklyContractHours
+        )
     then
-        System.out.print("Found Tim");
-        scoreHolder.addHardConstraintMatch(kcontext, 1000);
+        //scoreHolder.addHardConstraintMatch(kcontext, $scheduledHours - $weeklyContractHours);
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
+
+
+
+// ----------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------
+// Soft constraints
+// ----------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------
+
+// rule "Reward for having a high average of client hours satisfied"  // encourage client diversity
+// rule "Staff working during reasonable hours"
+
+rule "Staff should be close to their ideal billable standard"
+    when
+        $staff : Staff($idealHours : idealBillableHours )
+        accumulate(
+            Session(
+                $staff == staff,
+                $duration : getDuration()
+                );
+            $scheduledHours : sum($duration);
+            $scheduledHours != $idealHours
+        )
+    then
+        scoreHolder.addSoftConstraintMatch(kcontext,  (int)(Math.pow($scheduledHours - $idealHours, 2) * -1));
 end
