@@ -1,43 +1,54 @@
 package com.allenisalai.op;
 
+import org.hibernate.annotations.Cascade;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
-import java.util.UUID;
+import javax.persistence.*;
 
-
+@Entity
+@Table(name = "session")
 @PlanningEntity
 public class Session {
 
-    private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "idgen")
+    @SequenceGenerator(initialValue = 1, name = "idgen", sequenceName = "session_id_seq", allocationSize = 1)
+    @Column(name = "id")
+    private Integer id;
 
+    @OneToOne
+    @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
 
+    @OneToOne
+    @JoinColumn(name = "staff_id", referencedColumnName = "id")
     private Staff staff;
 
+    @Column(name = "start_time")
     private Integer startTime = 0;
 
+    @Column(name = "duration")
     private Integer duration = 0;
 
+    @Column(name = "day")
     private Integer day;
 
     public Session() {
 
     }
 
+
     public Session(Staff staff, Client client, Integer day) {
         this.staff = staff;
         this.client = client;
         this.day = day;
-
-        this.id = UUID.randomUUID();
     }
 
-    public UUID getId() {
+    public Integer getId() {
         return id;
     }
 
-    //@PlanningVariable(valueRangeProviderRefs = {"clients"})
     public Client getClient() {
         return this.client;
     }
@@ -46,7 +57,6 @@ public class Session {
         this.client = client;
     }
 
-    //@PlanningVariable(valueRangeProviderRefs = {"staff"})
     public Staff getStaff() {
         return this.staff;
     }
@@ -73,7 +83,6 @@ public class Session {
         this.duration = duration;
     }
 
-    //@PlanningVariable(valueRangeProviderRefs = {"days"})
     public Integer getDay() {
         return day;
     }
@@ -89,7 +98,7 @@ public class Session {
         int sess2End = s.startTime + s.duration;
 
         return (
-                this.day == s.getDay() &&
+                this.day.equals(s.getDay()) &&
                         (
                                 (s.startTime >= start && s.startTime < end)
                                         || (sess2End >= start && sess2End < end)
@@ -104,6 +113,6 @@ public class Session {
 
     public void print() {
         String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-        System.out.printf("%s: %s %s at %d for %d hours \n", this.staff.name, this.client.id, days[this.day], this.startTime, this.duration);
+        System.out.printf("%s: %s %s at %d for %d hours \n", this.staff.getFirstName(), this.client.getName(), days[this.day], this.startTime, this.duration);
     }
 }

@@ -1,29 +1,50 @@
 package com.allenisalai.op;
 
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "client")
 public class Client {
-    String id;
 
-    int contractPricePerHour;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Integer id;
 
-    int weeklyContractHours;
+    @Column(name = "first_name")
+    private String firstName;
 
-    public Client(String id, int contractPricePerHour, int weeklyContractHours) {
-        this.id = id;
-        this.contractPricePerHour = contractPricePerHour;
-        this.weeklyContractHours = weeklyContractHours;
-    }
+    @Column(name = "last_name")
+    private String lastName;
 
-    public String getId() {
+    @Column(name = "contract_rate")
+    private Integer contractPricePerHour;
+
+    @Column(name = "weekly_contract_hours")
+    private Integer weeklyContractHours;
+
+    public Integer getId() {
         return id;
     }
 
-    /*
-    public int getContractPricePerHour() {
+    public String getName() {
+        return this.firstName + " " + this.lastName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Integer getContractPricePerHour() {
         return contractPricePerHour;
     }
-    */
 
-    public int getWeeklyContractHours() {
+    public Integer getWeeklyContractHours() {
         return weeklyContractHours;
     }
 }
