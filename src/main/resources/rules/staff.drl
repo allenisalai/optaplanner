@@ -41,46 +41,6 @@ rule "Staff Should not exceed their max weekly hours"
         scoreHolder.addHardConstraintMatch(kcontext,  -1);
 end
 
-// rule "Staff can only bill for hour Types that they are cabable of" // 1-1 vs sup vs BCBA
-
-
-// ++ Client Rules
-// ________________________________________________________________________________________________________________
-rule "Client cannot exceed weekly hours"
-    when
-        $client : Client($weeklyContractHours : weeklyContractHours)
-        accumulate(
-            Session(
-                client == $client,
-                $duration : getDuration()
-                );
-            $scheduledHours : sum($duration);
-            $scheduledHours > $client.weeklyContractHours
-        )
-    then
-        //scoreHolder.addHardConstraintMatch(kcontext, $weeklyContractHours - $scheduledHours);
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
-end
-
-
-rule "Client be as close to their weekly hours as possible"
-    when
-        $client : Client($weeklyContractHours : weeklyContractHours)
-        accumulate(
-            Session(
-                client == $client,
-                $duration : getDuration()
-                );
-            $scheduledHours : sum($duration);
-            $scheduledHours < $client.weeklyContractHours
-        )
-    then
-        //scoreHolder.addHardConstraintMatch(kcontext, $scheduledHours - $weeklyContractHours);
-        scoreHolder.addHardConstraintMatch(kcontext, -1);
-end
-
-
-
 // ----------------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------------
 // Soft constraints

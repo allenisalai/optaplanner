@@ -5,11 +5,14 @@ import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 import javax.persistence.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
 @Table(name = "session")
 @PlanningEntity
 public class Session {
+
+    private static int planning_id = 0;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "idgen")
@@ -35,18 +38,25 @@ public class Session {
     private Integer day;
 
     public Session() {
-
     }
-
 
     public Session(Staff staff, Client client, Integer day) {
         this.staff = staff;
         this.client = client;
         this.day = day;
+
+
+        // set a negative id so that during planning we can compare sessions
+        planning_id--;
+        this.id = planning_id;
     }
 
     public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Client getClient() {
@@ -110,9 +120,4 @@ public class Session {
         return this.startTime + this.duration;
     }
 
-
-    public void print() {
-        String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-        System.out.printf("%s: %s %s at %d for %d hours \n", this.staff.getFirstName(), this.client.getName(), days[this.day], this.startTime, this.duration);
-    }
 }

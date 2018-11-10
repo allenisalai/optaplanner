@@ -23,9 +23,6 @@ public class App {
         SessionFactory sf = getSessionFactory();
         Session session = sf.openSession();
         EntityManager em = session.getEntityManagerFactory().createEntityManager();
-        //session.beginTransaction();
-
-
 
         System.out.println("Starting the process.");
 
@@ -41,9 +38,8 @@ public class App {
         System.out.println("Saving");
         solvedSchedule.save(em);
 
-        //session.getTransaction().commit();
         session.close();
-        System.out.println("Should Exit");
+        sf.close();
     }
 
     public static SessionFactory getSessionFactory() {

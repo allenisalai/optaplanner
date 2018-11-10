@@ -1,0 +1,67 @@
+package com.allenisalai.op;
+dialect "java"
+
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
+import com.allenisalai.op.Session;
+import com.allenisalai.op.Client;
+
+global HardSoftScoreHolder scoreHolder;
+
+// BT's cannot exceed more than 8 hours a day
+// Minimum time increments are 15 min
+// min session time is 1.5h (could be configurable)
+// max session time is 4h (could be configurable)
+// can be in different locations
+// Parent determines location
+// Drivetime should be under 30min
+// In office session could have 1 bt to many kids
+//
+
+// ----------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------
+// Hard constraints
+// ----------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------
+
+// ++ Client Rules
+// ________________________________________________________________________________________________________________
+rule "Client cannot exceed weekly hours"
+    when
+        $client : Client($weeklyContractHours : weeklyContractHours)
+        accumulate(
+            Session(
+                client == $client,
+                $duration : getDuration()
+                );
+            $scheduledHours : sum($duration);
+            $scheduledHours > $client.weeklyContractHours
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
+
+
+rule "Client be as close to their weekly hours as possible"
+    when
+        $client : Client($weeklyContractHours : weeklyContractHours)
+        accumulate(
+            Session(
+                client == $client,
+                $duration : getDuration()
+                );
+            $scheduledHours : sum($duration);
+            $scheduledHours < $client.weeklyContractHours
+        )
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end
+
+
+rule "Client cannot have overlapping sessions"
+    when
+        $s1 : Session($c : client, $id1 : id, startTime != 0, getDuration() != 0)
+        $s2 : Session(client == $c, id != $id1, startTime != 0, getDuration() != 0)
+        eval($s1.overlaps($s2))
+    then
+        scoreHolder.addHardConstraintMatch(kcontext, -1);
+end

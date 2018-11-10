@@ -67,20 +67,6 @@ public class Schedule {
                 .getResultList();
         this.clients.addAll(clientList);
 
-//
-//        // 65 total hours
-//        this.clients.add(new Client("Jimmy", 5, 12));
-//        this.clients.add(new Client("Tim", 10, 10));
-//        this.clients.add(new Client("Robert", 15, 10));
-//        this.clients.add(new Client("Jenny", 10, 8));
-//
-//        this.clients.add(new Client("Kary", 5, 6));
-//        this.clients.add(new Client("Matt", 10, 5));
-//        this.clients.add(new Client("Sally", 20, 5));
-//        this.clients.add(new Client("Ryan", 10, 4));
-//        this.clients.add(new Client("Bob", 15, 3));
-//        this.clients.add(new Client("Mark", 10, 2));
-
         this.sessions = new ArrayList<Session>();
         for (Staff s : this.staff) {
             for (Client c : this.clients) {
@@ -141,10 +127,7 @@ public class Schedule {
 
 
     public void print() {
-        for (Staff s : this.staff) {
-            this.printStaffSchedule(s);
-        }
-
+        this.printStaffSchedule();
     }
 
     public void save( EntityManager em ) {
@@ -153,6 +136,8 @@ public class Schedule {
 
         for (Session sess : this.sessions) {
             if (sess.getDuration() != 0 && sess.getStartTime() != 0) {
+                // remove planning id to persist to an actual id
+                sess.setId(null);
                 em.persist(sess);
             }
         }
@@ -161,28 +146,7 @@ public class Schedule {
         em.close();
     }
 
-    private void printStaffSchedule(Staff s) {
-        //String[] headers = {"Hour", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-
-        this.sessions.sort(new Comparator<Session>() {
-            public int compare(Session o1, Session o2) {
-                return o1.getStartTime().compareTo(o2.getStartTime());
-            }
-        });
-
-        this.sessions.sort(new Comparator<Session>() {
-            public int compare(Session o1, Session o2) {
-                return o1.getDay().compareTo(o2.getDay());
-            }
-        });
-
-
-        for (Session sess : this.sessions) {
-            if (sess.getStaff() == s && sess.getDuration() != 0) {
-                sess.print();
-            }
-        }
-
+    private void printStaffSchedule() {
         for (Client c : this.clients) {
             int totalHoursPlanned = 0;
             for (Session sess : this.sessions) {
@@ -216,7 +180,6 @@ public class Schedule {
 
         float revenuePercentage = (plannedRevenue / totalPossibleRevenue) * 100;
         System.out.printf("Percentage revenue planned:  $%.0f / $%.0f  (%.2f%%)\n", plannedRevenue, totalPossibleRevenue, revenuePercentage);
-
     }
 
 }

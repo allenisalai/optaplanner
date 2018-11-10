@@ -5,11 +5,12 @@
 
     <!-- Score configuration -->
     <scoreDirectorFactory>
-        <scoreDrl>rules.drl</scoreDrl>
+        <scoreDrl>rules/clients.drl</scoreDrl>
+        <scoreDrl>rules/staff.drl</scoreDrl>
     </scoreDirectorFactory>
 
     <!-- Optimization algorithms configuration -->
     <termination>
-        <secondsSpentLimit>3</secondsSpentLimit>
+        <secondsSpentLimit>10</secondsSpentLimit>
     </termination>
 </solver>
